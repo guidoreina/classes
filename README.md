@@ -1,4 +1,4 @@
-classes
-=======
+C++ classes
+===========
 
-Some classes in C++
+Classes in C++ which I am using in another project(s).
