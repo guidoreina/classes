@@ -64,7 +64,7 @@ namespace util {
 					const _Key& key() const;
 
 				private:
-					node* n;
+					const node* n;
 			};
 
 			// Begin.
@@ -102,7 +102,7 @@ namespace util {
 			_Compare _M_compare;
 
 			// Find.
-			node* find(const _Key& k) const;
+			const node* find(const _Key& k) const;
 
 			// Make node.
 			node* make_node(int height);
@@ -366,13 +366,13 @@ namespace util {
 	}
 
 	template<typename _Key, typename _Compare>
-	inline struct skiplist<_Key, _Compare>::node* skiplist<_Key, _Compare>::find(const _Key& k) const
+	inline const struct skiplist<_Key, _Compare>::node* skiplist<_Key, _Compare>::find(const _Key& k) const
 	{
 		int ret = -1;
 
-		node* x = _M_header;
+		const node* x = _M_header;
 		for (int i = _M_level - 1; i >= 0; i--) {
-			node* next;
+			const node* next;
 			while (((next = x->forward[i]) != NULL) && ((ret = _M_compare(next->key, k)) < 0)) {
 				x = next;
 			}
