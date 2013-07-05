@@ -27,6 +27,9 @@ namespace string {
 
 			char* data();
 
+			// Get end.
+			char* end();
+
 			// Get size.
 			size_t size() const;
 
@@ -103,6 +106,11 @@ namespace string {
 	inline char* buffer::data()
 	{
 		return _M_data;
+	}
+
+	inline char* buffer::end()
+	{
+		return _M_data + _M_used;
 	}
 
 	inline size_t buffer::size() const
