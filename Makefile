@@ -5,18 +5,22 @@ LDFLAGS=
 LIBS=-lpthread
 
 MAKEDEPEND=${CC} -MM
+
 SKIPLIST_TEST=skiplist_test
 ATOMIC_MARKABLE_PTR_TEST=atomic_markable_ptr_test
 BUFFER_TEST=buffer_test
 MEMCASEMEM_TEST=memcasemem_test
 MEMRCHR_TEST=memrchr_test
+VARINT_TEST=varint_test
 
 OBJS =	skiplist_test.o atomic_markable_ptr_test.o buffer_test.o string/buffer.o \
-	memcasemem_test.o string/memcasemem.o memrchr_test.o string/memrchr.o
+	memcasemem_test.o string/memcasemem.o memrchr_test.o string/memrchr.o \
+	varint_test.o util/varint.o
 
 DEPS:= ${OBJS:%.o=%.d}
 
-all: $(SKIPLIST_TEST) $(ATOMIC_MARKABLE_PTR_TEST) $(BUFFER_TEST) $(MEMCASEMEM_TEST) $(MEMRCHR_TEST)
+all: $(SKIPLIST_TEST) $(ATOMIC_MARKABLE_PTR_TEST) $(BUFFER_TEST) $(MEMCASEMEM_TEST) $(MEMRCHR_TEST) \
+	$(VARINT_TEST)
 
 ${SKIPLIST_TEST}: skiplist_test.o
 	${CC} ${CXXFLAGS} ${LDFLAGS} skiplist_test.o ${LIBS} -o $@
@@ -33,10 +37,15 @@ ${MEMCASEMEM_TEST}: memcasemem_test.o string/memcasemem.o
 ${MEMRCHR_TEST}: memrchr_test.o string/memrchr.o
 	${CC} ${CXXFLAGS} ${LDFLAGS} memrchr_test.o string/memrchr.o ${LIBS} -o $@
 
-clean:
-	rm -f $(SKIPLIST_TEST) $(ATOMIC_MARKABLE_PTR_TEST) $(BUFFER_TEST) $(MEMCASEMEM_TEST) $(MEMRCHR_TEST) ${OBJS} ${DEPS}
+${VARINT_TEST}: varint_test.o util/varint.o string/buffer.o
+	${CC} ${CXXFLAGS} ${LDFLAGS} varint_test.o util/varint.o string/buffer.o ${LIBS} -o $@
 
-${OBJS} ${DEPS} ${SKIPLIST_TEST} ${ATOMIC_MARKABLE_PTR_TEST} : Makefile
+clean:
+	rm -f $(SKIPLIST_TEST) $(ATOMIC_MARKABLE_PTR_TEST) $(BUFFER_TEST) $(MEMCASEMEM_TEST) \
+	$(MEMRCHR_TEST) $(VARINT_TEST) ${OBJS} ${DEPS}
+
+${OBJS} ${DEPS} ${SKIPLIST_TEST} ${ATOMIC_MARKABLE_PTR_TEST} $(BUFFER_TEST) $(MEMCASEMEM_TEST) \
+	$(MEMRCHR_TEST) $(VARINT_TEST) : Makefile
 
 .PHONY : all clean
 
