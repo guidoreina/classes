@@ -207,6 +207,10 @@ namespace util {
 			do {
 				if (find(k, preds, succs)) {
 					// Already inserted.
+					if (new_node) {
+						delete_node(new_node);
+					}
+
 					return false;
 				}
 
