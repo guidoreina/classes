@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Usage: %s <test-number>\n", argv[0]);
 		fprintf(stderr, "\t0: Test concurrent skip list with:\n");
 		fprintf(stderr, "\t\t%u readers\n", kNumberReaders);
-		fprintf(stderr, "\t\t%u writers, %u\n", kNumberWriters);
+		fprintf(stderr, "\t\t%u writers\n", kNumberWriters);
 		fprintf(stderr, "\t\t%u erasers\n", kNumberErasers);
 		fprintf(stderr, "\t\t%u iterators.\n", kNumberIterators);
 		fprintf(stderr, "\t1: Test iterators in concurrent skip list.\n");
