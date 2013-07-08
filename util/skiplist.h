@@ -18,7 +18,7 @@ namespace util {
 		private:
 			struct node {
 				// Key.
-				_Key key;
+				const _Key key;
 
 				// Level.
 				int level;
@@ -354,7 +354,8 @@ namespace util {
 
 	template<typename _Key, typename _Compare>
 	inline skiplist<_Key, _Compare>::node::node(int height)
-	: level(height)
+	: key(),
+	level(height)
 	{
 	}
 
