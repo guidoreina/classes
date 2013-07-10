@@ -50,9 +50,13 @@ namespace util {
 
 			// Erase.
 			bool erase(const _Key& k);
+			bool erase(const _Key& k, _Key& fullkey);
 
 			// Contains.
 			bool contains(const _Key& k) const;
+
+			// Find key.
+			bool find(const _Key& k, _Key& fullkey) const;
 
 			// Clear.
 			void clear();
@@ -111,6 +115,9 @@ namespace util {
 			// Allocate node.
 			node* allocate_node(int height);
 
+			// Unlink.
+			node* unlink(const _Key& k);
+
 			// Delete node.
 			void delete_node(node* n);
 
@@ -139,7 +146,7 @@ namespace util {
 	}
 
 	template<typename _Key, typename _Compare>
-	inline skiplist<_Key, _Compare>::~skiplist()
+	skiplist<_Key, _Compare>::~skiplist()
 	{
 		node* n = _M_header;
 		while (n) {
@@ -223,45 +230,27 @@ namespace util {
 	template<typename _Key, typename _Compare>
 	bool skiplist<_Key, _Compare>::erase(const _Key& k)
 	{
-		int ret = -1;
-
-		node* update[kMaxLevel];
-		node* x = _M_header;
-		for (int i = _M_level - 1; i >= 0; i--) {
-			node* next;
-			while (((next = x->forward[i]) != NULL) && ((ret = _M_compare(next->key, k)) < 0)) {
-				x = next;
-			}
-
-			update[i] = x;
-		}
-
-		if (ret != 0) {
-			// Not found.
+		node* x;
+		if ((x = unlink(k)) == NULL) {
 			return false;
-		}
-
-		x = x->forward[0];
-
-		for (int i = 0; i < _M_level; i++) {
-			if (update[i]->forward[i] != x) {
-				break;
-			}
-
-			update[i]->forward[i] = x->forward[i];
-		}
-
-		if (update[0]->forward[0]) {
-			update[0]->forward[0]->prev = update[0];
-		} else {
-			_M_tail = update[0];
 		}
 
 		delete_node(x);
 
-		while ((_M_level > 1) && (!_M_header->forward[_M_level - 1])) {
-			_M_level--;
+		return true;
+	}
+
+	template<typename _Key, typename _Compare>
+	bool skiplist<_Key, _Compare>::erase(const _Key& k, _Key& fullkey)
+	{
+		node* x;
+		if ((x = unlink(k)) == NULL) {
+			return false;
 		}
+
+		fullkey = x->key;
+
+		delete_node(x);
 
 		return true;
 	}
@@ -270,6 +259,19 @@ namespace util {
 	inline bool skiplist<_Key, _Compare>::contains(const _Key& k) const
 	{
 		return (find(k) != NULL);
+	}
+
+	template<typename _Key, typename _Compare>
+	inline bool skiplist<_Key, _Compare>::find(const _Key& k, _Key& fullkey) const
+	{
+		const node* x;
+		if ((x = find(k)) == NULL) {
+			return false;
+		}
+
+		fullkey = x->key;
+
+		return true;
 	}
 
 	template<typename _Key, typename _Compare>
@@ -367,7 +369,7 @@ namespace util {
 	}
 
 	template<typename _Key, typename _Compare>
-	inline const struct skiplist<_Key, _Compare>::node* skiplist<_Key, _Compare>::find(const _Key& k) const
+	const struct skiplist<_Key, _Compare>::node* skiplist<_Key, _Compare>::find(const _Key& k) const
 	{
 		int ret = -1;
 
@@ -408,6 +410,50 @@ namespace util {
 	inline struct skiplist<_Key, _Compare>::node* skiplist<_Key, _Compare>::allocate_node(int height)
 	{
 		return reinterpret_cast<node*>(malloc(sizeof(node) + ((height - 1) * sizeof(node*))));
+	}
+
+	template<typename _Key, typename _Compare>
+	struct skiplist<_Key, _Compare>::node* skiplist<_Key, _Compare>::unlink(const _Key& k)
+	{
+		int ret = -1;
+
+		node* update[kMaxLevel];
+		node* x = _M_header;
+		for (int i = _M_level - 1; i >= 0; i--) {
+			node* next;
+			while (((next = x->forward[i]) != NULL) && ((ret = _M_compare(next->key, k)) < 0)) {
+				x = next;
+			}
+
+			update[i] = x;
+		}
+
+		if (ret != 0) {
+			// Not found.
+			return NULL;
+		}
+
+		x = x->forward[0];
+
+		for (int i = 0; i < _M_level; i++) {
+			if (update[i]->forward[i] != x) {
+				break;
+			}
+
+			update[i]->forward[i] = x->forward[i];
+		}
+
+		if (update[0]->forward[0]) {
+			update[0]->forward[0]->prev = update[0];
+		} else {
+			_M_tail = update[0];
+		}
+
+		while ((_M_level > 1) && (!_M_header->forward[_M_level - 1])) {
+			_M_level--;
+		}
+
+		return x;
 	}
 
 	template<typename _Key, typename _Compare>
