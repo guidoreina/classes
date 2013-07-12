@@ -37,6 +37,9 @@ namespace util {
 				// Contains.
 				bool contains(const _Key& k) const;
 
+				// Find key.
+				bool find(const _Key& k, _Key& fullkey) const;
+
 				class iterator {
 					friend class insert_only_skiplist;
 
@@ -92,6 +95,7 @@ namespace util {
 				// Find.
 				bool find(const _Key& k, node** preds, node** succs);
 				bool find(const _Key& k, const node** preds, const node** succs) const;
+				const node* find(const _Key& k) const;
 
 				// Make node.
 				node* make_node(int height);
@@ -205,27 +209,22 @@ namespace util {
 		}
 
 		template<typename _Key, typename _Compare>
-		bool insert_only_skiplist<_Key, _Compare>::contains(const _Key& k) const
+		inline bool insert_only_skiplist<_Key, _Compare>::contains(const _Key& k) const
 		{
-			const node* pred = _M_header;
-			for (int level = _M_level_hint - 1; level >= 0; level--) {
-				const node* curr = pred->next[level].get();
-				while (curr) {
-					const node* succ = curr->next[level].get();
+			return (find(k) != NULL);
+		}
 
-					int ret;
-					if ((ret = _M_compare(curr->key, k)) < 0) {
-						pred = curr;
-						curr = succ;
-					} else if (ret == 0) {
-						return true;
-					} else {
-						break;
-					}
-				}
+		template<typename _Key, typename _Compare>
+		inline bool insert_only_skiplist<_Key, _Compare>::find(const _Key& k, _Key& fullkey) const
+		{
+			const node* x;
+			if ((x = find(k)) == NULL) {
+				return false;
 			}
 
-			return false;
+			fullkey = x->key;
+
+			return true;
 		}
 
 		template<typename _Key, typename _Compare>
@@ -314,10 +313,10 @@ namespace util {
 		{
 			const node* preds[kMaxLevel];
 			const node* succs[kMaxLevel];
-			const node* succ;
 
 			find(k, preds, succs);
 
+			const node* succ;
 			if ((succ = succs[0]) == NULL) {
 				return false;
 			}
@@ -350,10 +349,9 @@ namespace util {
 			for (int level = _M_level_hint - 1; level >= 0; level--) {
 				node* curr = pred->next[level].get();
 				while (curr) {
-					node* succ = curr->next[level].get();
 					if ((ret = _M_compare(curr->key, k)) < 0) {
 						pred = curr;
-						curr = succ;
+						curr = curr->next[level].get();
 					} else {
 						break;
 					}
@@ -375,10 +373,9 @@ namespace util {
 			for (int level = _M_level_hint - 1; level >= 0; level--) {
 				const node* curr = pred->next[level].get();
 				while (curr) {
-					const node* succ = curr->next[level].get();
 					if ((ret = _M_compare(curr->key, k)) < 0) {
 						pred = curr;
-						curr = succ;
+						curr = curr->next[level].get();
 					} else {
 						break;
 					}
@@ -389,6 +386,28 @@ namespace util {
 			}
 
 			return (ret == 0);
+		}
+
+		template<typename _Key, typename _Compare>
+		const struct insert_only_skiplist<_Key, _Compare>::node* insert_only_skiplist<_Key, _Compare>::find(const _Key& k) const
+		{
+			const node* pred = _M_header;
+			for (int level = _M_level_hint - 1; level >= 0; level--) {
+				const node* curr = pred->next[level].get();
+				while (curr) {
+					int ret;
+					if ((ret = _M_compare(curr->key, k)) < 0) {
+						pred = curr;
+						curr = curr->next[level].get();
+					} else if (ret == 0) {
+						return curr;
+					} else {
+						break;
+					}
+				}
+			}
+
+			return NULL;
 		}
 
 		template<typename _Key, typename _Compare>
