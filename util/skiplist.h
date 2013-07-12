@@ -371,17 +371,22 @@ namespace util {
 	template<typename _Key, typename _Compare>
 	const struct skiplist<_Key, _Compare>::node* skiplist<_Key, _Compare>::find(const _Key& k) const
 	{
-		int ret = -1;
-
 		const node* x = _M_header;
 		for (int i = _M_level - 1; i >= 0; i--) {
 			const node* next;
-			while (((next = x->forward[i]) != NULL) && ((ret = _M_compare(next->key, k)) < 0)) {
-				x = next;
+			while ((next = x->forward[i]) != NULL) {
+				int ret;
+				if ((ret = _M_compare(next->key, k)) < 0) {
+					x = next;
+				} else if (ret == 0) {
+					return next;
+				} else {
+					break;
+				}
 			}
 		}
 
-		return (ret == 0) ? x->forward[0] : NULL;
+		return NULL;
 	}
 
 	template<typename _Key, typename _Compare>
