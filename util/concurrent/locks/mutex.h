@@ -58,6 +58,29 @@ namespace util {
 			{
 				return (pthread_mutex_unlock(&_M_mutex) == 0);
 			}
+
+			class scoped_mutex {
+				public:
+					// Constructor.
+					scoped_mutex(mutex& m);
+
+					// Destructor.
+					~scoped_mutex();
+
+				private:
+					mutex& _M_mutex;
+			};
+
+			inline scoped_mutex::scoped_mutex(mutex& m)
+			: _M_mutex(m)
+			{
+				_M_mutex.lock();
+			}
+
+			inline scoped_mutex::~scoped_mutex()
+			{
+				_M_mutex.unlock();
+			}
 		}
 	}
 }

@@ -58,6 +58,29 @@ namespace util {
 			{
 				return (pthread_spin_unlock(&_M_spinlock) == 0);
 			}
+
+			class scoped_spinlock {
+				public:
+					// Constructor.
+					scoped_spinlock(spinlock& sl);
+
+					// Destructor.
+					~scoped_spinlock();
+
+				private:
+					spinlock& _M_spinlock;
+			};
+
+			inline scoped_spinlock::scoped_spinlock(spinlock& sl)
+			: _M_spinlock(sl)
+			{
+				_M_spinlock.lock();
+			}
+
+			inline scoped_spinlock::~scoped_spinlock()
+			{
+				_M_spinlock.unlock();
+			}
 		}
 	}
 }
