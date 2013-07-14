@@ -55,9 +55,6 @@ namespace util {
 			// Contains.
 			bool contains(const _Key& k) const;
 
-			// Find key.
-			bool find(const _Key& k, _Key& fullkey) const;
-
 			// Clear.
 			void clear();
 
@@ -262,19 +259,6 @@ namespace util {
 	}
 
 	template<typename _Key, typename _Compare>
-	inline bool skiplist<_Key, _Compare>::find(const _Key& k, _Key& fullkey) const
-	{
-		const node* x;
-		if ((x = find(k)) == NULL) {
-			return false;
-		}
-
-		fullkey = x->key;
-
-		return true;
-	}
-
-	template<typename _Key, typename _Compare>
 	void skiplist<_Key, _Compare>::clear()
 	{
 		node* n = _M_header->forward[0];
@@ -351,7 +335,28 @@ namespace util {
 	template<typename _Key, typename _Compare>
 	inline bool skiplist<_Key, _Compare>::seek(const _Key& k, iterator& it) const
 	{
-		return ((it.n = find(k)) != NULL);
+		const node* x = _M_header;
+		const node* next = NULL;
+		for (int i = _M_level - 1; i >= 0; i--) {
+			while ((next = x->forward[i]) != NULL) {
+				int ret;
+				if ((ret = _M_compare(next->key, k)) < 0) {
+					x = next;
+				} else if (ret == 0) {
+					it.n = next;
+					return true;
+				} else {
+					break;
+				}
+			}
+		}
+
+		if (!next) {
+			return false;
+		}
+
+		it.n = next;
+		return true;
 	}
 
 	template<typename _Key, typename _Compare>

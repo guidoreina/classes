@@ -522,9 +522,9 @@ void test_single_threaded_skiplist()
 	print_list(list, true);
 	print_list(list, false);
 
-	printf("Inserting from 1 to 10...\n");
+	printf("Inserting from 1 to 10, skipping 5...\n");
 	for (long i = 10; i > 0; i--) {
-		if (!list.insert(i)) {
+		if ((i != 5) && (!list.insert(i))) {
 			fprintf(stderr, "Couldn't insert %d.\n", i);
 			return;
 		}
@@ -532,6 +532,41 @@ void test_single_threaded_skiplist()
 
 	print_list(list, true);
 	print_list(list, false);
+
+	printf("From 0 forward...\n");
+	if (list.seek(0, it)) {
+		do {
+			printf("%d\n", it.key());
+		} while (list.next(it));
+	}
+
+	printf("From 1 forward...\n");
+	if (list.seek(1, it)) {
+		do {
+			printf("%d\n", it.key());
+		} while (list.next(it));
+	}
+
+	printf("From 5 forward...\n");
+	if (list.seek(5, it)) {
+		do {
+			printf("%d\n", it.key());
+		} while (list.next(it));
+	}
+
+	printf("From 10 forward...\n");
+	if (list.seek(10, it)) {
+		do {
+			printf("%d\n", it.key());
+		} while (list.next(it));
+	}
+
+	printf("From 11 forward...\n");
+	if (list.seek(11, it)) {
+		do {
+			printf("%d\n", it.key());
+		} while (list.next(it));
+	}
 }
 
 void print_list(const util::skiplist<long, longcmp>& list, bool forward)
