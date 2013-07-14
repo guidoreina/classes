@@ -13,15 +13,18 @@ BUFFER_TEST=buffer_test
 MEMCASEMEM_TEST=memcasemem_test
 MEMRCHR_TEST=memrchr_test
 VARINT_TEST=varint_test
+ARENA_TEST=arena_test
 
 OBJS =	skiplist_test.o insert_only_skiplist_test.o atomic_markable_ptr_test.o \
 	buffer_test.o string/buffer.o memcasemem_test.o string/memcasemem.o \
-	memrchr_test.o string/memrchr.o varint_test.o util/varint.o
+	memrchr_test.o string/memrchr.o varint_test.o util/varint.o \
+	arena_test.o util/arena.o util/concurrent/arena.o
 
 DEPS:= ${OBJS:%.o=%.d}
 
 all: ${SKIPLIST_TEST} ${INSERT_ONLY_SKIPLIST_TEST} ${ATOMIC_MARKABLE_PTR_TEST} \
-	${BUFFER_TEST} ${MEMCASEMEM_TEST} ${MEMRCHR_TEST} ${VARINT_TEST}
+	${BUFFER_TEST} ${MEMCASEMEM_TEST} ${MEMRCHR_TEST} ${VARINT_TEST} \
+	${ARENA_TEST}
 
 ${SKIPLIST_TEST}: skiplist_test.o
 	${CC} ${CXXFLAGS} ${LDFLAGS} skiplist_test.o ${LIBS} -o $@
@@ -44,12 +47,16 @@ ${MEMRCHR_TEST}: memrchr_test.o string/memrchr.o
 ${VARINT_TEST}: varint_test.o util/varint.o string/buffer.o
 	${CC} ${CXXFLAGS} ${LDFLAGS} varint_test.o util/varint.o string/buffer.o ${LIBS} -o $@
 
+${ARENA_TEST}: arena_test.o util/arena.o util/concurrent/arena.o
+	${CC} ${CXXFLAGS} ${LDFLAGS} arena_test.o util/arena.o util/concurrent/arena.o ${LIBS} -o $@
+
 clean:
 	rm -f ${SKIPLIST_TEST} ${INSERT_ONLY_SKIPLIST_TEST} ${ATOMIC_MARKABLE_PTR_TEST} \
-	${BUFFER_TEST} ${MEMCASEMEM_TEST} ${MEMRCHR_TEST} ${VARINT_TEST} ${OBJS} ${DEPS}
+	${BUFFER_TEST} ${MEMCASEMEM_TEST} ${MEMRCHR_TEST} ${VARINT_TEST} ${ARENA_TEST} \
+	${OBJS} ${DEPS}
 
 ${OBJS} ${DEPS} ${SKIPLIST_TEST} ${INSERT_ONLY_SKIPLIST_TEST} ${ATOMIC_MARKABLE_PTR_TEST} \
-	${BUFFER_TEST} ${MEMCASEMEM_TEST} ${MEMRCHR_TEST} ${VARINT_TEST} : Makefile
+	${BUFFER_TEST} ${MEMCASEMEM_TEST} ${MEMRCHR_TEST} ${VARINT_TEST} ${ARENA_TEST} : Makefile
 
 .PHONY : all clean
 
