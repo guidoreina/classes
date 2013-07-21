@@ -1,0 +1,32 @@
+CC=g++
+CXXFLAGS=-O3 -Wall -pedantic -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-format -Wno-long-long -I.
+
+LDFLAGS=
+LIBS=
+
+MAKEDEPEND=${CC} -MM
+PROGRAM=sequential_write_only_file_test
+
+OBJS =	io/sequential_write_only_file.o sequential_write_only_file_test.o
+
+DEPS:= ${OBJS:%.o=%.d}
+
+all: ${PROGRAM}
+
+${PROGRAM}: ${OBJS}
+	${CC} ${CXXFLAGS} ${LDFLAGS} ${OBJS} ${LIBS} -o $@
+
+clean:
+	rm -f ${PROGRAM} ${OBJS} ${DEPS}
+
+${OBJS} ${DEPS} ${PROGRAM} : Makefile.sequential_write_only_file_test
+
+.PHONY : all clean
+
+%.d : %.cpp
+	${MAKEDEPEND} ${CXXFLAGS} $< -MT ${@:%.d=%.o} > $@
+
+%.o : %.cpp
+	${CC} ${CXXFLAGS} -c -o $@ $<
+
+-include ${DEPS}
