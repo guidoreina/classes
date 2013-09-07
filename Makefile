@@ -19,7 +19,8 @@ URL_TEST=url_test
 OBJS =	skiplist_test.o insert_only_skiplist_test.o atomic_markable_ptr_test.o \
 	buffer_test.o string/buffer.o memcasemem_test.o string/memcasemem.o \
 	memrchr_test.o string/memrchr.o varint_test.o util/varint.o \
-	arena_test.o util/arena.o util/concurrent/arena.o
+	arena_test.o util/arena.o util/concurrent/arena.o net/internet/scheme.o \
+	net/internet/url.o url_test.o
 
 DEPS:= ${OBJS:%.o=%.d}
 
