@@ -50,8 +50,13 @@ bool string::buffer::vformat(const char* format, va_list ap)
 	int size = _M_size - _M_used;
 
 	do {
+		va_list aq;
+		va_copy(aq, ap);
+
 		int n;
-		if ((n = vsnprintf(_M_data + _M_used, size, format, ap)) > -1) {
+		if ((n = vsnprintf(_M_data + _M_used, size, format, aq)) > -1) {
+			va_end(aq);
+
 			if (n < size) {
 				_M_used += n;
 				break;
@@ -59,6 +64,8 @@ bool string::buffer::vformat(const char* format, va_list ap)
 
 			size = n + 1;
 		} else {
+			va_end(aq);
+
 			size *= 2;
 		}
 
