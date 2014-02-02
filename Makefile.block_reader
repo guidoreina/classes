@@ -1,0 +1,32 @@
+CC=g++
+CXXFLAGS=-g -Wall -pedantic -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-long-long -I.
+
+LDFLAGS=
+LIBS=
+
+MAKEDEPEND=${CC} -MM
+PROGRAM=block_reader
+
+OBJS =	string/buffer.o fs/file.o util/block_reader.o util/file_block_reader.o block_reader_test.o
+
+DEPS:= ${OBJS:%.o=%.d}
+
+all: $(PROGRAM)
+
+${PROGRAM}: ${OBJS}
+	${CC} ${CXXFLAGS} ${LDFLAGS} ${OBJS} ${LIBS} -o $@
+
+clean:
+	rm -f ${PROGRAM} ${OBJS} ${OBJS} ${DEPS}
+
+${OBJS} ${DEPS} ${PROGRAM} : Makefile
+
+.PHONY : all clean
+
+%.d : %.cpp
+	${MAKEDEPEND} ${CXXFLAGS} $< -MT ${@:%.d=%.o} > $@
+
+%.o : %.cpp
+	${CC} ${CXXFLAGS} -c -o $@ $<
+
+-include ${DEPS}
