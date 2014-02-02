@@ -24,7 +24,6 @@ namespace string {
 
 			// Get data.
 			const char* data() const;
-
 			char* data();
 
 			// Get end.
