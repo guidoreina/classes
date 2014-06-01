@@ -10,10 +10,10 @@
 
 #include <stdlib.h>
 #include <new>
-#include "util/difference.h"
+#include "util/minus.h"
 
 namespace util {
-	template<typename _Key, typename _Compare = util::difference<_Key> >
+	template<typename _Key, typename _Compare = util::minus<_Key> >
 	class skiplist {
 		private:
 			struct node {

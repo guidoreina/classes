@@ -352,6 +352,9 @@ namespace util {
     _M_count--;
 
 #if HAVE_FREE_LIST
+    // Call destructor.
+    z->~node();
+
     add_free_list(z);
 #else
     delete z;

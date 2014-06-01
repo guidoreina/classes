@@ -1,3 +1,6 @@
+// Compile with:
+// g++ -g -o fifo_test fifo_test.cpp -I . -std=c++11 -Wall --pedantic -DHAVE_FREE_LIST
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "util/fifo.h"

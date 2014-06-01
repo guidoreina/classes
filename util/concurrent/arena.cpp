@@ -21,7 +21,7 @@ void* util::concurrent::arena::allocate(size_t size)
 		size += sizeof(void*) - mod;
 	}
 
-	locks::scoped_mutex lock(_M_lock);
+	locks::scoped_lock lock(_M_lock);
 
 	if (_M_used + size > kDataSize) {
 		if (!create_block(MAX(kDataSize, size))) {

@@ -14,7 +14,7 @@
 
 #include <stdlib.h>
 #include <new>
-#include "util/difference.h"
+#include "util/minus.h"
 #include "util/concurrent/atomic/markable_ptr.h"
 #include "util/concurrent/atomic/atomic.h"
 #include "util/concurrent/locks/spinlock.h" // For the list of deleted nodes.
@@ -24,7 +24,7 @@ static __thread struct drand48_data random_data = {{0xc0}};
 
 namespace util {
 	namespace concurrent {
-		template<typename _Key, typename _Compare = util::difference<_Key> >
+		template<typename _Key, typename _Compare = util::minus<_Key> >
 		class skiplist {
 			public:
 				// Constructor.

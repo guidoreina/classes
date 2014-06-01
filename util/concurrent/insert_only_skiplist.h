@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 #include <new>
-#include "util/difference.h"
+#include "util/minus.h"
 #include "util/concurrent/atomic/pointer.h"
 #include "util/concurrent/atomic/atomic.h"
 
@@ -18,7 +18,7 @@ static __thread struct drand48_data random_data = {{0xc0}};
 
 namespace util {
 	namespace concurrent {
-		template<typename _Key, typename _Compare = util::difference<_Key> >
+		template<typename _Key, typename _Compare = util::minus<_Key> >
 		class insert_only_skiplist {
 			public:
 				// Constructor.
