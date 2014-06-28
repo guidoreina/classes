@@ -1,0 +1,32 @@
+CC=g++
+CXXFLAGS=-g -Wall -pedantic -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-long-long -I.
+
+LDFLAGS=
+LIBS=-lrt
+
+MAKEDEPEND = ${CC} -MM
+PROGRAM = mqtest
+
+OBJS = ipc/message_queue.o mqtest.o
+
+DEPS := ${OBJS:%.o=%.d}
+
+all: $(PROGRAM)
+
+${PROGRAM}: ${OBJS}
+	${CC} ${CXXFLAGS} ${LDFLAGS} ${OBJS} ${LIBS} -o $@
+
+clean:
+	rm -f ${PROGRAM} ${OBJS} ${DEPS}
+
+${OBJS} ${DEPS} ${PROGRAM} : Makefile.mqtest
+
+.PHONY : all clean
+
+%.d : %.cpp
+	${MAKEDEPEND} ${CXXFLAGS} $< -MT ${@:%.d=%.o} > $@
+
+%.o : %.cpp
+	${CC} ${CXXFLAGS} -c -o $@ $<
+
+-include ${DEPS}
