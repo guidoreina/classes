@@ -26,9 +26,9 @@ namespace util {
   template<typename _T>
   inline void swap(_T& a, _T& b)
   {
-    _T tmp(move(a));
-    a = move(b);
-    b = move(tmp);
+    _T tmp(util::move(a));
+    a = util::move(b);
+    b = util::move(tmp);
   }
 }
 
