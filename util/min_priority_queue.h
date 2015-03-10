@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <new>
 #include "util/move.h"
 
 namespace util {
@@ -13,9 +14,16 @@ namespace util {
 
       // Constructor.
       min_priority_queue();
+      min_priority_queue(min_priority_queue&& other);
 
       // Destructor.
       ~min_priority_queue();
+
+      // Move assignment operator.
+      min_priority_queue& operator=(min_priority_queue&& other);
+
+      // Swap content.
+      void swap(min_priority_queue& other);
 
       // Free priority queue.
       void free();
@@ -31,6 +39,7 @@ namespace util {
 
       // Insert element.
       bool push(const value_type& x);
+      bool push(value_type&& x);
 
       // Return top element.
       const value_type* top() const;
@@ -72,9 +81,55 @@ namespace util {
   }
 
   template<typename _Tp>
+  inline min_priority_queue<_Tp>::min_priority_queue(min_priority_queue&& other)
+    : _M_values(other._M_values),
+      _M_size(other._M_size),
+      _M_used(other._M_used)
+  {
+    other._M_values = NULL;
+    other._M_size = 0;
+    other._M_used = 0;
+  }
+
+  template<typename _Tp>
   inline min_priority_queue<_Tp>::~min_priority_queue()
   {
     free();
+  }
+
+  template<typename _Tp>
+  min_priority_queue<_Tp>&
+  min_priority_queue<_Tp>::operator=(min_priority_queue&& other)
+  {
+    // http://scottmeyers.blogspot.de/2014/06/the-drawbacks-of-implementing-move.html
+    // It is better not to swap the objects.
+
+    if (_M_values) {
+      // Invoke the destructors.
+      for (size_t i = 0; i < _M_used; i++) {
+        _M_values[i].value_type::~value_type();
+      }
+
+      ::free(_M_values);
+    }
+
+    _M_values = other._M_values;
+    _M_size = other._M_size;
+    _M_used = other._M_used;
+
+    other._M_values = NULL;
+    other._M_size = 0;
+    other._M_used = 0;
+
+    return *this;
+  }
+
+  template<typename _Tp>
+  inline void min_priority_queue<_Tp>::swap(min_priority_queue& other)
+  {
+    util::swap(_M_values, other._M_values);
+    util::swap(_M_size, other._M_size);
+    util::swap(_M_used, other,_M_used);
   }
 
   template<typename _Tp>
@@ -125,6 +180,30 @@ namespace util {
     }
 
     new (&_M_values[_M_used]) value_type(x);
+
+    size_t i = _M_used++;
+
+    while (i > 0) {
+      size_t parent = PARENT(i);
+      if (_M_values[i] < _M_values[parent]) {
+        util::swap(_M_values[i], _M_values[parent]);
+        i = parent;
+      } else {
+        break;
+      }
+    }
+
+    return true;
+  }
+
+  template<typename _Tp>
+  bool min_priority_queue<_Tp>::push(value_type&& x)
+  {
+    if (!allocate()) {
+      return false;
+    }
+
+    new (&_M_values[_M_used]) value_type(util::move(x));
 
     size_t i = _M_used++;
 
