@@ -17,18 +17,19 @@ VARINT_TEST=varint_test
 ARENA_TEST=arena_test
 URL_TEST=url_test
 MIN_PRIORITY_QUEUE_TEST=min_priority_queue_test
+VECTOR_TEST=vector_test
 
 OBJS =	skiplist_test.o insert_only_skiplist_test.o atomic_markable_ptr_test.o \
 	buffer_test.o string/buffer.o memcasemem_test.o string/memcasemem.o \
 	memrchr_test.o string/memrchr.o varint_test.o util/varint.o \
 	arena_test.o util/arena.o util/concurrent/arena.o net/internet/scheme.o \
-	net/internet/url.o url_test.o min_priority_queue_test.o
+	net/internet/url.o url_test.o min_priority_queue_test.o vector_test.o
 
 DEPS:= ${OBJS:%.o=%.d}
 
 all: ${SKIPLIST_TEST} ${INSERT_ONLY_SKIPLIST_TEST} ${ATOMIC_MARKABLE_PTR_TEST} \
 	${BUFFER_TEST} ${MEMCASEMEM_TEST} ${MEMRCHR_TEST} ${VARINT_TEST} \
-	${ARENA_TEST} ${URL_TEST} ${MIN_PRIORITY_QUEUE_TEST}
+	${ARENA_TEST} ${URL_TEST} ${MIN_PRIORITY_QUEUE_TEST} ${VECTOR_TEST}
 
 ${SKIPLIST_TEST}: skiplist_test.o
 	${CC} ${CXXFLAGS} ${LDFLAGS} skiplist_test.o ${LIBS} -o $@
@@ -60,14 +61,17 @@ ${URL_TEST}: url_test.o string/buffer.o net/internet/scheme.o net/internet/url.o
 ${MIN_PRIORITY_QUEUE_TEST}: min_priority_queue_test.o
 	${CC} ${CXXFLAGS} ${LDFLAGS} min_priority_queue_test.o ${LIBS} -o $@
 
+${VECTOR_TEST}: vector_test.o
+	${CC} ${CXXFLAGS} ${LDFLAGS} vector_test.o ${LIBS} -o $@
+
 clean:
 	rm -f ${SKIPLIST_TEST} ${INSERT_ONLY_SKIPLIST_TEST} ${ATOMIC_MARKABLE_PTR_TEST} \
 	${BUFFER_TEST} ${MEMCASEMEM_TEST} ${MEMRCHR_TEST} ${VARINT_TEST} ${ARENA_TEST} \
-	${URL_TEST} ${MIN_PRIORITY_QUEUE_TEST} ${OBJS} ${DEPS}
+	${URL_TEST} ${MIN_PRIORITY_QUEUE_TEST} ${VECTOR_TEST} ${OBJS} ${DEPS}
 
 ${OBJS} ${DEPS} ${SKIPLIST_TEST} ${INSERT_ONLY_SKIPLIST_TEST} ${ATOMIC_MARKABLE_PTR_TEST} \
 	${BUFFER_TEST} ${MEMCASEMEM_TEST} ${MEMRCHR_TEST} ${VARINT_TEST} ${ARENA_TEST} \
-	${URL_TEST} ${MIN_PRIORITY_QUEUE_TEST} : Makefile
+	${URL_TEST} ${MIN_PRIORITY_QUEUE_TEST} ${VECTOR_TEST} : Makefile
 
 .PHONY : all clean
 
