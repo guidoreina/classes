@@ -23,7 +23,7 @@ time_t net::http::date::parse(const void* buf, size_t len, struct tm& timestamp)
   const uint8_t* end = ptr + len;
 
   // Skip day of the week.
-  while ((ptr < end) && (IS_ALPHA(*ptr))) {
+  while ((ptr < end) && (util::is_alpha(*ptr))) {
     ptr++;
   }
 
@@ -44,7 +44,7 @@ time_t net::http::date::parse(const void* buf, size_t len, struct tm& timestamp)
       return static_cast<time_t>(-1);
     }
 
-    return parse_ansic(ptr, end, timestamp);
+    return _M_parse_ansic(ptr, end, timestamp);
   }
 
   if ((*ptr != ',') || (n < 3) || (n > 9)) {
@@ -69,7 +69,7 @@ time_t net::http::date::parse(const void* buf, size_t len, struct tm& timestamp)
   }
 
   // Parse day of the month.
-  if ((!IS_DIGIT(*ptr)) || (!IS_DIGIT(*(ptr + 1)))) {
+  if ((!util::is_digit(*ptr)) || (!util::is_digit(*(ptr + 1)))) {
     return static_cast<time_t>(-1);
   }
 
@@ -92,7 +92,7 @@ time_t net::http::date::parse(const void* buf, size_t len, struct tm& timestamp)
 
   // Parse month.
   unsigned mon;
-  if (!parse_month(++ptr, mon)) {
+  if (!_M_parse_month(++ptr, mon)) {
     return static_cast<time_t>(-1);
   }
 
@@ -105,7 +105,7 @@ time_t net::http::date::parse(const void* buf, size_t len, struct tm& timestamp)
       return static_cast<time_t>(-1);
     }
 
-    if (!parse_year(++ptr, year)) {
+    if (!_M_parse_year(++ptr, year)) {
       return static_cast<time_t>(-1);
     }
 
@@ -117,7 +117,7 @@ time_t net::http::date::parse(const void* buf, size_t len, struct tm& timestamp)
 
     ptr++;
 
-    if ((!IS_DIGIT(*ptr)) || (!IS_DIGIT(*(ptr + 1)))) {
+    if ((!util::is_digit(*ptr)) || (!util::is_digit(*(ptr + 1)))) {
       return static_cast<time_t>(-1);
     }
 
@@ -142,7 +142,7 @@ time_t net::http::date::parse(const void* buf, size_t len, struct tm& timestamp)
   unsigned hour;
   unsigned min;
   unsigned sec;
-  if (!parse_time(ptr, hour, min, sec)) {
+  if (!_M_parse_time(ptr, hour, min, sec)) {
     return static_cast<time_t>(-1);
   }
 
@@ -171,15 +171,15 @@ time_t net::http::date::parse(const void* buf, size_t len, struct tm& timestamp)
 #endif
 }
 
-time_t net::http::date::parse_ansic(const uint8_t* begin,
-                                    const uint8_t* end,
-                                    struct tm& timestamp)
+time_t net::http::date::_M_parse_ansic(const uint8_t* begin,
+                                       const uint8_t* end,
+                                       struct tm& timestamp)
 {
   const uint8_t* ptr = begin;
 
   // Parse month.
   unsigned mon;
-  if (!parse_month(ptr, mon)) {
+  if (!_M_parse_month(ptr, mon)) {
     return static_cast<time_t>(-1);
   }
 
@@ -191,7 +191,7 @@ time_t net::http::date::parse_ansic(const uint8_t* begin,
 
   // Parse day of the month.
   unsigned mday;
-  if (IS_DIGIT(*ptr)) {
+  if (util::is_digit(*ptr)) {
     mday = *ptr - '0';
   } else if (*ptr == ' ') {
     mday = 0;
@@ -201,7 +201,7 @@ time_t net::http::date::parse_ansic(const uint8_t* begin,
 
   ptr++;
 
-  if (IS_DIGIT(*ptr)) {
+  if (util::is_digit(*ptr)) {
     mday = (mday * 10) + (*ptr - '0');
     ptr++;
   }
@@ -222,13 +222,13 @@ time_t net::http::date::parse_ansic(const uint8_t* begin,
   unsigned hour;
   unsigned min;
   unsigned sec;
-  if (!parse_time(ptr, hour, min, sec)) {
+  if (!_M_parse_time(ptr, hour, min, sec)) {
     return static_cast<time_t>(-1);
   }
 
   // Parse year.
   unsigned year;
-  if (!parse_year(ptr += 9, year)) {
+  if (!_M_parse_year(ptr += 9, year)) {
     return static_cast<time_t>(-1);
   }
 
@@ -249,7 +249,7 @@ time_t net::http::date::parse_ansic(const uint8_t* begin,
 #endif
 }
 
-bool net::http::date::parse_month(const uint8_t* ptr, unsigned& mon)
+bool net::http::date::_M_parse_month(const uint8_t* ptr, unsigned& mon)
 {
   switch (*ptr) {
     case 'J':
@@ -364,13 +364,13 @@ bool net::http::date::parse_month(const uint8_t* ptr, unsigned& mon)
   return true;
 }
 
-bool net::http::date::parse_time(const uint8_t* ptr,
-                                 unsigned& hour,
-                                 unsigned& min,
-                                 unsigned& sec)
+bool net::http::date::_M_parse_time(const uint8_t* ptr,
+                                    unsigned& hour,
+                                    unsigned& min,
+                                    unsigned& sec)
 {
   // Parse hour.
-  if ((!IS_DIGIT(*ptr)) || (!IS_DIGIT(*(ptr + 1)))) {
+  if ((!util::is_digit(*ptr)) || (!util::is_digit(*(ptr + 1)))) {
     return false;
   }
 
@@ -385,7 +385,7 @@ bool net::http::date::parse_time(const uint8_t* ptr,
   ptr++;
 
   // Parse minutes.
-  if ((!IS_DIGIT(*ptr)) || (!IS_DIGIT(*(ptr + 1)))) {
+  if ((!util::is_digit(*ptr)) || (!util::is_digit(*(ptr + 1)))) {
     return false;
   }
 
@@ -400,7 +400,7 @@ bool net::http::date::parse_time(const uint8_t* ptr,
   ptr++;
 
   // Parse seconds.
-  if ((!IS_DIGIT(*ptr)) || (!IS_DIGIT(*(ptr + 1)))) {
+  if ((!util::is_digit(*ptr)) || (!util::is_digit(*(ptr + 1)))) {
     return false;
   }
 
